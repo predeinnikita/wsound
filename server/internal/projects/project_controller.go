@@ -1,22 +1,20 @@
-package project_controllers
+package projects
 
 import (
-	"animal-sound-recognizer/internal/project/entities"
-	"animal-sound-recognizer/internal/project/repositories"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
 )
 
-func InitProjectsController(router *chi.Mux) {
+func InitController(router *chi.Mux) {
 
 	router.Route("/projects", func(r chi.Router) {
 
 		// Create project
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 
-			var newProject project_entities.ProjectEntity
+			var newProject ProjectEntity
 
 			decodeErr := json.NewDecoder(r.Body).Decode(&newProject)
 			if decodeErr != nil {
@@ -24,7 +22,7 @@ func InitProjectsController(router *chi.Mux) {
 				return
 			}
 
-			project, createErr := project_repository.Create(newProject)
+			project, createErr := Create(newProject)
 			if createErr != nil {
 				http.Error(w, decodeErr.Error(), http.StatusBadRequest)
 				return
@@ -49,7 +47,7 @@ func InitProjectsController(router *chi.Mux) {
 				return
 			}
 
-			project, err := project_repository.GetProject(projectID)
+			project, err := GetProject(projectID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
@@ -83,7 +81,7 @@ func InitProjectsController(router *chi.Mux) {
 
 			offset := (page - 1) * limit
 
-			project, err := project_repository.GetProjects(limit, offset)
+			project, err := GetProjects(limit, offset)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
@@ -108,14 +106,14 @@ func InitProjectsController(router *chi.Mux) {
 				return
 			}
 
-			var project project_entities.ProjectEntity
+			var project ProjectEntity
 			decodeErr := json.NewDecoder(r.Body).Decode(&project)
 			if decodeErr != nil {
 				http.Error(w, decodeErr.Error(), http.StatusBadRequest)
 				return
 			}
 
-			err = project_repository.Update(projectID, project)
+			err = Update(projectID, project)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
@@ -132,8 +130,11 @@ func InitProjectsController(router *chi.Mux) {
 				return
 			}
 
-			err = project_repository.Delete(projectID)
-
+			err = Delete(projectID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 		})
 	})
 

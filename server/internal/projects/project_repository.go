@@ -1,8 +1,7 @@
-package project_repository
+package projects
 
 import (
 	"animal-sound-recognizer/internal/db"
-	"animal-sound-recognizer/internal/project/entities"
 	"time"
 )
 
@@ -15,68 +14,50 @@ type ProjectDal struct {
 	CreatedAt   time.Time `gorm:"autoCreateTime"`
 }
 
-func projectDalToProjectEntity(dal ProjectDal) project_entities.ProjectEntity {
-	return project_entities.ProjectEntity{
-		ID:          dal.ID,
-		Name:        dal.Name,
-		Description: dal.Description,
-		CreatedAt:   dal.CreatedAt,
-	}
-}
-
-func projectEntityToProjectDal(entity project_entities.ProjectEntity) ProjectDal {
-	return ProjectDal{
-		ID:          entity.ID,
-		Name:        entity.Name,
-		Description: entity.Description,
-		CreatedAt:   entity.CreatedAt,
-	}
-}
-
-func Create(project project_entities.ProjectEntity) (project_entities.ProjectEntity, error) {
+func Create(project ProjectEntity) (ProjectEntity, error) {
 	err := connection.AutoMigrate(ProjectDal{})
 	if err != nil {
-		return project_entities.ProjectEntity{}, err
+		return ProjectEntity{}, err
 	}
 
-	projectDal := projectEntityToProjectDal(project)
+	projectDal := FromEntityToDal(project)
 	connection.Create(&projectDal)
 
-	return projectDalToProjectEntity(projectDal), nil
+	return FromDalToEntity(projectDal), nil
 }
 
-func GetProject(id uint64) (project_entities.ProjectEntity, error) {
+func GetProject(id uint64) (ProjectEntity, error) {
 	err := connection.AutoMigrate(ProjectDal{})
 	if err != nil {
-		return project_entities.ProjectEntity{}, err
+		return ProjectEntity{}, err
 	}
 
 	var projectDal ProjectDal
 
 	result := connection.First(&projectDal, id)
 	if result.Error != nil {
-		return project_entities.ProjectEntity{}, result.Error
+		return ProjectEntity{}, result.Error
 	}
 
-	return projectDalToProjectEntity(projectDal), nil
+	return FromDalToEntity(projectDal), nil
 }
 
-func GetProjects(limit int, offset int) (project_entities.ProjectEntityList, error) {
+func GetProjects(limit int, offset int) (ProjectEntityList, error) {
 	var projectDals []ProjectDal
 
 	connection.Order("created_at DESC").Limit(limit).Offset(offset).Find(&projectDals)
 
-	var projectEntities = make([]project_entities.ProjectEntity, 0)
+	var projectEntities = make([]ProjectEntity, 0)
 	for _, projectDal := range projectDals {
-		projectEntities = append(projectEntities, projectDalToProjectEntity(projectDal))
+		projectEntities = append(projectEntities, FromDalToEntity(projectDal))
 	}
 
-	return project_entities.ProjectEntityList{
+	return ProjectEntityList{
 		Projects: projectEntities,
 	}, nil
 }
 
-func Update(id uint64, project project_entities.ProjectEntity) error {
+func Update(id uint64, project ProjectEntity) error {
 	var projectDal ProjectDal
 	result := connection.First(&projectDal, id)
 	if result.Error != nil {

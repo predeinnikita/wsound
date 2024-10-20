@@ -1,4 +1,4 @@
-package project_entities
+package projects
 
 import "time"
 
