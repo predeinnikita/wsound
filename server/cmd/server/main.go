@@ -1,6 +1,7 @@
 package main
 
 import (
+	"animal-sound-recognizer/internal/project/controllers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
@@ -21,6 +22,8 @@ func run() error {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+
+	project_controllers.InitProjectsController(r)
 
 	return http.ListenAndServe(":3333", r)
 }
