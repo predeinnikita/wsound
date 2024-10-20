@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const connectionString = "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+const connectionString = "host=localhost user=postgres password=hui dbname=postgres port=32768 sslmode=disable TimeZone=Asia/Shanghai"
 
 func CreateConnection() *gorm.DB {
 	db, err := gorm.Open(
