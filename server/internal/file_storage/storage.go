@@ -1,75 +1,105 @@
 package file_storage
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+	"io"
 	"log"
 )
 
-const username = "admin"
-const password = "password"
-const database = "file"
+var endpoint = "localhost:9000"
+var accessKeyID = "bIfSnMq0spOLvyXX1Zhu"
+var secretAccessKey = "bqNeN1gi3Bz5b7M4qi5CbsM7JDqacsElxCguudqW"
+var useSSL = false
 
-var uri = fmt.Sprintf("mongodb://%s:%s@localhost:27017/%s?authSource=admin", username, password, database)
+var bucketName = "file"
 
-var client, _ = mongo.Connect(options.Client().ApplyURI(uri))
-var ctx = context.TODO()
-
-type fileDal struct {
-	Filename string `bson:"filename"`
-	Data     []byte `bson:"data"`
-}
+var minioClient, _ = minio.New(endpoint, &minio.Options{
+	Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+	Secure: useSSL,
+})
 
 func SaveFile(filename string, file []byte) (string, error) {
-	collection := client.Database("file").Collection("audio")
+	contentType := "application/octet-stream"
+	ctx := context.Background()
 
-	result, err := collection.InsertOne(ctx, bson.M{
-		"filename": filename,
-		"data":     file,
-	})
-
+	fmt.Println(1)
+	exists, err := minioClient.BucketExists(ctx, bucketName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
+	}
+	if !exists {
+		err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: "us-east-1"})
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	fileReader := bytes.NewReader(file)
+	fileSize := int64(len(file))
+
+	id := uuid.New().String()
+
+	info, err := minioClient.PutObject(ctx, bucketName, id, fileReader, fileSize, minio.PutObjectOptions{
+		ContentType: contentType,
+		UserMetadata: map[string]string{
+			"Filename": filename,
+		},
+	})
+	if err != nil {
 		return "", err
 	}
 
-	insertedID := result.InsertedID.(bson.ObjectID).Hex()
-
-	return insertedID, nil
+	log.Printf("Файл успешно загружен: %s (размер: %d байт)", info.Key, info.Size)
+	return id, nil
 }
 
 func DeleteFile(id string) error {
-	objectId, objectIdErr := bson.ObjectIDFromHex(id)
+	ctx := context.Background()
 
-	if objectIdErr != nil {
-		return fmt.Errorf("invalid id")
+	err := minioClient.RemoveObject(ctx, bucketName, id, minio.RemoveObjectOptions{})
+	if err != nil {
+		log.Println("Ошибка при удалении файла:", err)
+		return err
 	}
 
-	collection := client.Database("file").Collection("audio")
-	_, deleteErr := collection.DeleteOne(ctx, bson.M{"_id": objectId})
-
-	if deleteErr != nil {
-		return deleteErr
-	}
-
+	log.Printf("Файл %s успешно удалён", id)
 	return nil
 }
 
 func GetFile(id string) ([]byte, string, error) {
-	objectId, _ := bson.ObjectIDFromHex(id)
-	collection := client.Database("file").Collection("audio")
+	ctx := context.Background()
 
-	var result fileDal
-	err := collection.FindOne(context.TODO(), bson.M{"_id": objectId}).Decode(&result)
-
-	fmt.Println(result.Filename)
+	object, err := minioClient.GetObject(ctx, bucketName, id, minio.GetObjectOptions{})
+	defer object.Close()
 
 	if err != nil {
+		log.Println("Ошибка при получении файла:", err)
 		return nil, "", err
 	}
 
-	return result.Data, result.Filename, nil
+	buf := new(bytes.Buffer)
+	_, err = io.Copy(buf, object)
+	if err != nil {
+		log.Println("Ошибка при чтении файла:", err)
+		return nil, "", err
+	}
+
+	stat, err := object.Stat()
+	if err != nil {
+		log.Println("Ошибка при получении метаданных файла:", err)
+		return nil, "", err
+	}
+
+	originalFilename := stat.UserMetadata["Filename"]
+	if originalFilename == "" {
+		originalFilename = id
+	}
+
+	log.Printf("Файл %s успешно получен", originalFilename)
+	return buf.Bytes(), originalFilename, nil
 }
