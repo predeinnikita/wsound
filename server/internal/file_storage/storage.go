@@ -3,7 +3,6 @@ package file_storage
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -27,7 +26,6 @@ func SaveFile(filename string, file []byte) (string, error) {
 	contentType := "application/octet-stream"
 	ctx := context.Background()
 
-	fmt.Println(1)
 	exists, err := minioClient.BucketExists(ctx, bucketName)
 	if err != nil {
 		log.Fatalln(err)
