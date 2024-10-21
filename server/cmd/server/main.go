@@ -1,6 +1,7 @@
 package main
 
 import (
+	"animal-sound-recognizer/internal/audio"
 	"animal-sound-recognizer/internal/file_storage"
 	"animal-sound-recognizer/internal/projects"
 	"github.com/go-chi/chi/v5"
@@ -26,6 +27,7 @@ func run() error {
 
 	projects.InitController(r)
 	file_storage.InitController(r)
+	audio.InitController(r)
 
 	return http.ListenAndServe(":3333", r)
 }
