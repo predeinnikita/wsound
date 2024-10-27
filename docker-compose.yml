@@ -11,15 +11,6 @@ services:
     depends_on:
       - db
       - minio
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=example
-      - DB_NAME=mydatabase
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin123
 
   db:
     image: postgres:13
