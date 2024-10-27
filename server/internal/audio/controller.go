@@ -12,7 +12,6 @@ func InitController(router *chi.Mux) {
 
 	router.Route("/audio", func(r chi.Router) {
 
-		// Create audio
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			var newAudio AudioEntity
 
@@ -41,7 +40,6 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Get audio
 		r.Get("/{audioID}", func(w http.ResponseWriter, r *http.Request) {
 			audioId, err := strconv.ParseUint(chi.URLParam(r, "audioID"), 10, 64)
 			if err != nil {
@@ -66,7 +64,6 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Get audios
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 
 			projectId, _ := strconv.ParseUint(r.URL.Query().Get("projectId"), 10, 64)
@@ -101,14 +98,44 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Edit audio
 		r.Patch("/{audioID}", func(w http.ResponseWriter, r *http.Request) {
+			audioId, err := strconv.ParseUint(chi.URLParam(r, "audioID"), 10, 64)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 
+			var editAudioRequest EditAudioRequest
+			err = json.NewDecoder(r.Body).Decode(&editAudioRequest)
+
+			fmt.Println(editAudioRequest)
+
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			err = EditAudio(audioId, editAudioRequest)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
 		})
 
-		// Delete audio
 		r.Delete("/{audioID}", func(w http.ResponseWriter, r *http.Request) {
+			audioId, err := strconv.ParseUint(chi.URLParam(r, "audioID"), 10, 64)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 
+			err = DeleteAudio(audioId)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 		})
 	})
 

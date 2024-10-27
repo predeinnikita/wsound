@@ -10,3 +10,7 @@ type AudioEntity struct {
 type AudioEntityList struct {
 	Audios []AudioEntity `json:"audios"`
 }
+
+type EditAudioRequest struct {
+	Name string `json:"name"`
+}

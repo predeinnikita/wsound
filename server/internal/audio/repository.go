@@ -58,3 +58,40 @@ func GetAudios(projectId uint64, limit int, offset int) (AudioEntityList, error)
 		Audios: audioEntities,
 	}, nil
 }
+
+func EditAudio(id uint64, data EditAudioRequest) error {
+	fmt.Println(id)
+
+	fmt.Println(data)
+
+	var audioDal AudioDal
+	result := connection.First(&audioDal, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	audioDal.Name = data.Name
+	saveResult := connection.Save(&audioDal)
+
+	if saveResult.Error != nil {
+		return saveResult.Error
+	}
+
+	return nil
+}
+
+func DeleteAudio(id uint64) error {
+	var audioDal AudioDal
+
+	result := connection.First(&audioDal, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	deleteResult := connection.Delete(&audioDal)
+	if deleteResult.Error != nil {
+		return deleteResult.Error
+	}
+
+	return nil
+}

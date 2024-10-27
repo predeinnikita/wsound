@@ -11,7 +11,6 @@ func InitController(router *chi.Mux) {
 
 	router.Route("/projects", func(r chi.Router) {
 
-		// Create project
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 
 			var newProject ProjectEntity
@@ -39,7 +38,6 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Get project
 		r.Get("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
@@ -64,7 +62,6 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Get projects
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 
 			pageStr := r.URL.Query().Get("page")
@@ -98,7 +95,6 @@ func InitController(router *chi.Mux) {
 			w.Write(jsonData)
 		})
 
-		// Edit project
 		r.Patch("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
@@ -122,7 +118,6 @@ func InitController(router *chi.Mux) {
 			w.WriteHeader(http.StatusOK)
 		})
 
-		// Delete project
 		r.Delete("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
