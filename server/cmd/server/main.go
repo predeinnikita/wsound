@@ -29,5 +29,5 @@ func run() error {
 	file_storage.InitController(r)
 	audio.InitController(r)
 
-	return http.ListenAndServe(":3333", r)
+	return http.ListenAndServe(":8080", r)
 }

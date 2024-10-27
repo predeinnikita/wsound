@@ -10,11 +10,10 @@ import (
 	"log"
 )
 
-var endpoint = "localhost:9000"
-var accessKeyID = "bIfSnMq0spOLvyXX1Zhu"
-var secretAccessKey = "bqNeN1gi3Bz5b7M4qi5CbsM7JDqacsElxCguudqW"
+var endpoint = "minio:9000"
+var accessKeyID = "admin"
+var secretAccessKey = "adminadmin"
 var useSSL = false
-
 var bucketName = "file"
 
 var minioClient, _ = minio.New(endpoint, &minio.Options{
@@ -25,17 +24,7 @@ var minioClient, _ = minio.New(endpoint, &minio.Options{
 func SaveFile(filename string, file []byte) (string, error) {
 	contentType := "application/octet-stream"
 	ctx := context.Background()
-
-	exists, err := minioClient.BucketExists(ctx, bucketName)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if !exists {
-		err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: "us-east-1"})
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
+	createBucketIfNotExists(ctx)
 
 	fileReader := bytes.NewReader(file)
 	fileSize := int64(len(file))
@@ -58,6 +47,7 @@ func SaveFile(filename string, file []byte) (string, error) {
 
 func DeleteFile(id string) error {
 	ctx := context.Background()
+	createBucketIfNotExists(ctx)
 
 	err := minioClient.RemoveObject(ctx, bucketName, id, minio.RemoveObjectOptions{})
 	if err != nil {
@@ -71,6 +61,7 @@ func DeleteFile(id string) error {
 
 func GetFile(id string) ([]byte, string, error) {
 	ctx := context.Background()
+	createBucketIfNotExists(ctx)
 
 	object, err := minioClient.GetObject(ctx, bucketName, id, minio.GetObjectOptions{})
 	defer object.Close()
@@ -100,4 +91,17 @@ func GetFile(id string) ([]byte, string, error) {
 
 	log.Printf("Файл %s успешно получен", originalFilename)
 	return buf.Bytes(), originalFilename, nil
+}
+
+func createBucketIfNotExists(ctx context.Context) {
+	exists, err := minioClient.BucketExists(ctx, bucketName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !exists {
+		err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: "us-east-1"})
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }
