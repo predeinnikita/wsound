@@ -2,17 +2,9 @@ package projects
 
 import (
 	"animal-sound-recognizer/internal/db"
-	"time"
 )
 
 var connection = db.CreateConnection()
-
-type ProjectDal struct {
-	ID          uint64    `gorm:"primaryKey"`
-	Name        string    `gorm:"size:255;not null"`
-	Description string    `gorm:"type:text"`
-	CreatedAt   time.Time `gorm:"autoCreateTime"`
-}
 
 func Create(project ProjectEntity) (ProjectEntity, error) {
 	err := connection.AutoMigrate(ProjectDal{})
