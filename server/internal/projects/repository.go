@@ -36,7 +36,6 @@ func GetProject(id uint64) (ProjectEntity, error) {
 
 func GetProjects(limit int, offset int) (ProjectEntityList, error) {
 	var projectDals []ProjectDal
-
 	connection.Order("created_at DESC").Limit(limit).Offset(offset).Find(&projectDals)
 
 	var projectEntities = make([]ProjectEntity, 0)
@@ -44,8 +43,12 @@ func GetProjects(limit int, offset int) (ProjectEntityList, error) {
 		projectEntities = append(projectEntities, FromDalToEntity(projectDal))
 	}
 
+	var total int64
+	connection.Model(&ProjectDal{}).Count(&total)
+
 	return ProjectEntityList{
 		Projects: projectEntities,
+		Total:    total,
 	}, nil
 }
 
