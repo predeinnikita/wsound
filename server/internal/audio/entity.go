@@ -9,6 +9,7 @@ type AudioEntity struct {
 
 type AudioEntityList struct {
 	Audios []AudioEntity `json:"audios"`
+	Total  int64         `json:"total"`
 }
 
 type EditAudioRequest struct {

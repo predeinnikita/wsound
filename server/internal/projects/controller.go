@@ -1,6 +1,7 @@
 package projects
 
 import (
+	"animal-sound-recognizer/internal/rest"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"net/http"
@@ -17,19 +18,32 @@ func InitController(router *chi.Mux) {
 
 			decodeErr := json.NewDecoder(r.Body).Decode(&newProject)
 			if decodeErr != nil {
-				http.Error(w, decodeErr.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "invalid request body",
+					Detail:  decodeErr.Error(),
+				})
 				return
 			}
 
 			project, createErr := Create(newProject)
 			if createErr != nil {
 				http.Error(w, decodeErr.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "create project error",
+					Detail:  decodeErr.Error(),
+				})
 				return
 			}
 
 			jsonData, err := json.Marshal(project)
 			if err != nil {
-				http.Error(w, "Не удалось преобразовать данные в JSON", http.StatusInternalServerError)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusInternalServerError,
+					Message: "project to json error",
+					Detail:  decodeErr.Error(),
+				})
 				return
 			}
 
@@ -41,19 +55,31 @@ func InitController(router *chi.Mux) {
 		r.Get("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "get projectId error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			project, err := GetProject(projectID)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "get project error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			jsonData, err := json.Marshal(project)
 			if err != nil {
-				http.Error(w, "Не удалось преобразовать данные в JSON", http.StatusInternalServerError)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "project to json error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
@@ -80,13 +106,21 @@ func InitController(router *chi.Mux) {
 
 			project, err := GetProjects(limit, offset)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "get projects error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			jsonData, err := json.Marshal(project)
 			if err != nil {
-				http.Error(w, "Не удалось преобразовать данные в JSON", http.StatusInternalServerError)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusInternalServerError,
+					Message: "projects to json error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
@@ -98,20 +132,32 @@ func InitController(router *chi.Mux) {
 		r.Patch("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "get projectId error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			var project ProjectEntity
 			decodeErr := json.NewDecoder(r.Body).Decode(&project)
 			if decodeErr != nil {
-				http.Error(w, decodeErr.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "project to json error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			err = Update(projectID, project)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusInternalServerError,
+					Message: "update project error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
@@ -121,16 +167,23 @@ func InitController(router *chi.Mux) {
 		r.Delete("/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "get projectId error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 
 			err = Delete(projectID)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusInternalServerError,
+					Message: "delete project error",
+					Detail:  err.Error(),
+				})
 				return
 			}
 		})
 	})
-
 }

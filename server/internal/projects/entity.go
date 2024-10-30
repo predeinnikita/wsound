@@ -11,4 +11,5 @@ type ProjectEntity struct {
 
 type ProjectEntityList struct {
 	Projects []ProjectEntity `json:"projects"`
+	Total    int64           `json:"total"`
 }
