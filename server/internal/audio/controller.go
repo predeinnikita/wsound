@@ -13,7 +13,7 @@ func InitController(router *chi.Mux) {
 	router.Route("/audio", func(r chi.Router) {
 
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-			var newAudio AudioEntity
+			var newAudio Audio
 
 			err := json.NewDecoder(r.Body).Decode(&newAudio)
 			if err != nil {

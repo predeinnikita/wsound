@@ -14,7 +14,7 @@ func InitController(router *chi.Mux) {
 
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 
-			var newProject ProjectEntity
+			var newProject Project
 
 			decodeErr := json.NewDecoder(r.Body).Decode(&newProject)
 			if decodeErr != nil {
@@ -140,7 +140,7 @@ func InitController(router *chi.Mux) {
 				return
 			}
 
-			var project ProjectEntity
+			var project Project
 			decodeErr := json.NewDecoder(r.Body).Decode(&project)
 			if decodeErr != nil {
 				rest.ResponseError(w, rest.Error{

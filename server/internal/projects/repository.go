@@ -6,62 +6,61 @@ import (
 
 var connection = db.CreateConnection()
 
-func Create(project ProjectEntity) (ProjectEntity, error) {
-	err := connection.AutoMigrate(ProjectDal{})
+func Create(project Project) (Project, error) {
+	err := connection.AutoMigrate(Project{})
 	if err != nil {
-		return ProjectEntity{}, err
+		return Project{}, err
 	}
 
-	projectDal := FromEntityToDal(project)
-	connection.Create(&projectDal)
+	connection.Create(&project)
 
-	return FromDalToEntity(projectDal), nil
+	return project, nil
 }
 
-func GetProject(id uint64) (ProjectEntity, error) {
-	err := connection.AutoMigrate(ProjectDal{})
+func GetProject(id uint64) (Project, error) {
+	err := connection.AutoMigrate(Project{})
 	if err != nil {
-		return ProjectEntity{}, err
+		return Project{}, err
 	}
 
-	var projectDal ProjectDal
+	var project Project
 
-	result := connection.First(&projectDal, id)
+	result := connection.First(&project, id)
 	if result.Error != nil {
-		return ProjectEntity{}, result.Error
+		return Project{}, result.Error
 	}
 
-	return FromDalToEntity(projectDal), nil
+	return project, nil
 }
 
-func GetProjects(limit int, offset int) (ProjectEntityList, error) {
-	var projectDals []ProjectDal
-	connection.Order("created_at DESC").Limit(limit).Offset(offset).Find(&projectDals)
+func GetProjects(limit int, offset int) (ProjectList, error) {
+	var projects []Project
+	connection.Order("created_at DESC").Limit(limit).Offset(offset).Find(&projects)
 
-	var projectEntities = make([]ProjectEntity, 0)
-	for _, projectDal := range projectDals {
-		projectEntities = append(projectEntities, FromDalToEntity(projectDal))
+	var projectEntities = make([]Project, 0)
+	for _, project := range projects {
+		projectEntities = append(projectEntities, project)
 	}
 
 	var total int64
-	connection.Model(&ProjectDal{}).Count(&total)
+	connection.Model(&Project{}).Count(&total)
 
-	return ProjectEntityList{
+	return ProjectList{
 		Projects: projectEntities,
 		Total:    total,
 	}, nil
 }
 
-func Update(id uint64, project ProjectEntity) error {
-	var projectDal ProjectDal
-	result := connection.First(&projectDal, id)
+func Update(id uint64, newProject Project) error {
+	var project Project
+	result := connection.First(&project, id)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	projectDal.Name = project.Name
-	projectDal.Description = project.Description
-	saveResult := connection.Save(&projectDal)
+	project.Name = newProject.Name
+	project.Description = newProject.Description
+	saveResult := connection.Save(&project)
 
 	if saveResult.Error != nil {
 		return saveResult.Error
@@ -71,14 +70,14 @@ func Update(id uint64, project ProjectEntity) error {
 }
 
 func Delete(id uint64) error {
-	var projectDal ProjectDal
+	var project Project
 
-	result := connection.First(&projectDal, id)
+	result := connection.First(&project, id)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	deleteResult := connection.Delete(&projectDal)
+	deleteResult := connection.Delete(&project)
 	if deleteResult.Error != nil {
 		return deleteResult.Error
 	}

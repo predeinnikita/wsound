@@ -7,68 +7,67 @@ import (
 
 var connection = db.CreateConnection()
 
-func Create(audio AudioEntity) (AudioEntity, error) {
-	err := connection.AutoMigrate(AudioDal{})
+func Create(audio Audio) (Audio, error) {
+	err := connection.AutoMigrate(Audio{})
 	if err != nil {
-		return AudioEntity{}, err
+		return Audio{}, err
 	}
 
-	var projectDal projects.ProjectDal
-	if err := connection.First(&projectDal, audio.ProjectID).Error; err != nil {
-		return AudioEntity{}, err
+	var project projects.Project
+	if err := connection.First(&project, audio.ProjectID).Error; err != nil {
+		return Audio{}, err
 	}
 
-	audioDal := FromEntityToDal(audio)
-	connection.Create(&audioDal)
+	connection.Create(&audio)
 
-	return FromDalToEntity(audioDal), nil
+	return audio, nil
 }
 
-func GetAudio(id uint64) (AudioEntity, error) {
-	err := connection.AutoMigrate(AudioDal{})
+func GetAudio(id uint64) (Audio, error) {
+	err := connection.AutoMigrate(Audio{})
 	if err != nil {
-		return AudioEntity{}, err
+		return Audio{}, err
 	}
 
-	var audioDal AudioDal
+	var audio Audio
 
-	result := connection.First(&audioDal, id)
+	result := connection.First(&audio, id)
 	if result.Error != nil {
-		return AudioEntity{}, result.Error
+		return Audio{}, result.Error
 	}
 
-	return FromDalToEntity(audioDal), nil
+	return audio, nil
 }
 
-func GetAudios(projectId uint64, limit int, offset int) (AudioEntityList, error) {
-	var audioDals []AudioDal
+func GetAudios(projectId uint64, limit int, offset int) (AudioList, error) {
+	var audios []Audio
 
 	all := connection.Where("project_id = ?", projectId).Order("created_at DESC")
-	all.Limit(limit).Offset(offset).Find(&audioDals)
+	all.Limit(limit).Offset(offset).Find(&audios)
 
-	var audioEntities = make([]AudioEntity, 0)
-	for _, audioDal := range audioDals {
-		audioEntities = append(audioEntities, FromDalToEntity(audioDal))
+	var audioEntities = make([]Audio, 0)
+	for _, audio := range audios {
+		audioEntities = append(audioEntities, audio)
 	}
 
 	var total int64
 	all.Count(&total)
 
-	return AudioEntityList{
+	return AudioList{
 		Audios: audioEntities,
 		Total:  total,
 	}, nil
 }
 
 func EditAudio(id uint64, data EditAudioRequest) error {
-	var audioDal AudioDal
-	result := connection.First(&audioDal, id)
+	var audio Audio
+	result := connection.First(&audio, id)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	audioDal.Name = data.Name
-	saveResult := connection.Save(&audioDal)
+	audio.Name = data.Name
+	saveResult := connection.Save(&audio)
 
 	if saveResult.Error != nil {
 		return saveResult.Error
@@ -78,14 +77,14 @@ func EditAudio(id uint64, data EditAudioRequest) error {
 }
 
 func DeleteAudio(id uint64) error {
-	var audioDal AudioDal
+	var audio Audio
 
-	result := connection.First(&audioDal, id)
+	result := connection.First(&audio, id)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	deleteResult := connection.Delete(&audioDal)
+	deleteResult := connection.Delete(&audio)
 	if deleteResult.Error != nil {
 		return deleteResult.Error
 	}
