@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>a</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+    <script src="https://unpkg.com/mustache@latest"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <link rel="stylesheet" href="index.css" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div hx-trigger="load" hx-get="header.html"></div>
+    <div class="container my-5">
+      <h2>Create New Project</h2>
+
+      <form hx-post="api/projects" id="form" hx-ext="json-enc">
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="projectName"
+            name="name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="projectName">Project description</label>
+          <input
+            type="text"
+            class="form-control"
+            id="projectName"
+            name="description"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="create-proj-button">
+          Create Project
+        </button>
+      </form>
+    </div>
+    <script>
+      document.addEventListener("htmx:afterRequest", function (evt) {
+        if (evt.target.id === "form") {
+          window.open("index.html");
+        }
+      });
+    </script>
+  </body>
+</html>

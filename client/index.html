@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>JS Bin</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates.js"></script>
+    <script src="https://unpkg.com/mustache@latest"></script>
+    <link rel="stylesheet" href="index.css" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div hx-trigger="load" hx-get="header.html"></div>
+    <div class="container my-5">
+      <h2 class="mb-4">Projects</h2>
+      <button
+        class="btn btn-primary mb-3"
+        onclick="window.location.href='create-project.html'"
+      >
+        Create New Project
+      </button>
+      <div hx-ext="client-side-templates">
+        <div
+          id="content"
+          class="list-group"
+          hx-trigger="load"
+          hx-get="/api/projects"
+          mustache-template="foo"
+        ></div>
+
+        <template id="foo"
+          >{{#projects}}
+          <a
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            href="projects/{{id}}"
+          >
+            <div>{{name}}</div>
+            <div>{{description}}</div>
+          </a>
+          {{/projects}}</template
+        >
+      </div>
+    </div>
+  </body>
+</html>
