@@ -49,7 +49,7 @@
     <script>
       document.addEventListener("htmx:afterRequest", function (evt) {
         if (evt.target.id === "form") {
-          window.open("index.html");
+          window.location = "index.html";
         }
       });
     </script>
