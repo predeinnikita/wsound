@@ -15,4 +15,3 @@ COPY ./app.py ./app.py
 COPY ./src ./src
 
 CMD ["fastapi", "run", "app.py"]
-#CMD ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]

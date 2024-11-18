@@ -5,7 +5,7 @@ const path = require("path");
 const app = express();
 
 const proxyMiddleware = createProxyMiddleware({
-  target: "http://localhost:",
+  target: "http://localhost:8080",
   changeOrigin: true,
   pathRewrite: {
     "http://localhost:5500/api": "",
