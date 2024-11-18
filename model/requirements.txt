@@ -1,0 +1,5 @@
+stqdm
+torch==2.2.1
+torchaudio
+fastapi
+fastapi[standard]

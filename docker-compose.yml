@@ -12,6 +12,14 @@ services:
       - db
       - minio
 
+  model:
+    build:
+      context: model
+      dockerfile: Dockerfile
+    container_name: model
+    ports:
+      - "8000:8000"
+
   db:
     image: postgres:13
     container_name: postgres_db
