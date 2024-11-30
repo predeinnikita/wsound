@@ -22,8 +22,16 @@ app.get("/index.css", (req, res) => {
   res.sendFile(path.join(__dirname, "/index.css"));
 });
 
+app.get("/project.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "/project.js"));
+});
+
+app.get("/projects/:id", (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, "/project.html"));
+});
+
 app.get("/header.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "/header.html"));
+  res.status(200).sendFile(path.join(__dirname, "/header.html"));
 });
 
 app.get("/create-project.html", (req, res) => {
