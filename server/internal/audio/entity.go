@@ -7,6 +7,7 @@ type Audio struct {
 	StorageID string    `json:"storage_id" gorm:"size:255;not null"`
 	Name      string    `json:"name"       gorm:"size:255;not null"`
 	ProjectID uint64    `json:"project_id" gorm:"size:255;not null"`
+	Status    Status    `json:"status"     gorm:"default:not_wolf"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 

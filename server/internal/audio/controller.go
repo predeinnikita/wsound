@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"animal-sound-recognizer/internal/recognizer"
 	"animal-sound-recognizer/internal/rest"
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
@@ -23,6 +24,11 @@ func InitController(router *chi.Mux) {
 					Detail:  err.Error(),
 				})
 				return
+			}
+
+			result := recognizer.ProcessAudio(newAudio.StorageID)
+			if result.Result[0].IsWolf {
+				newAudio.Status = WolfStatus
 			}
 
 			audio, err := Create(newAudio)
