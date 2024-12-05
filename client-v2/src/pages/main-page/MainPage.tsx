@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import styles from "./MainPage.module.css";
-import { Typography, List } from "antd";
+import { Typography, List, Button, Flex } from "antd";
 import { Projects, getProjects } from "./service";
 import { useNavigate } from "react-router";
 
@@ -19,7 +19,12 @@ export const MainPage: FC = () => {
 
   return (
     <div className={styles.main}>
-      <Typography.Title>Projects</Typography.Title>
+      <Flex justify="space-between" align="center">
+        <Typography.Title>Projects</Typography.Title>
+        <Button onClick={() => navigate("create-project")} type="primary">
+          Create project
+        </Button>
+      </Flex>
       <List
         loading={isLoading}
         size="large"

@@ -21,3 +21,7 @@ export const uploadAudioToStorage = (file: any) => {
 export const addAudio = (payload: AddAudioPayload) => {
   return axios.post("/api/audio", payload);
 };
+
+export const deleteAudio = (audioId: number) => {
+  return axios.delete(`/api/audio/${audioId}`);
+};
