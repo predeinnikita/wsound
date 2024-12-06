@@ -8,7 +8,7 @@ import (
 var connection = db.CreateConnection()
 
 func Create(audio Audio) (Audio, error) {
-	err := connection.AutoMigrate(Audio{})
+	err := connection.AutoMigrate(Audio{}, Interval{})
 	if err != nil {
 		return Audio{}, err
 	}
@@ -24,14 +24,14 @@ func Create(audio Audio) (Audio, error) {
 }
 
 func GetAudio(id uint64) (Audio, error) {
-	err := connection.AutoMigrate(Audio{})
+	err := connection.AutoMigrate(Audio{}, Interval{})
 	if err != nil {
 		return Audio{}, err
 	}
 
 	var audio Audio
 
-	result := connection.First(&audio, id)
+	result := connection.Preload("Intervals").First(&audio, id)
 	if result.Error != nil {
 		return Audio{}, result.Error
 	}
@@ -43,7 +43,7 @@ func GetAudios(projectId uint64, limit int, offset int) (AudioList, error) {
 	var audios []Audio
 
 	all := connection.Where("project_id = ?", projectId).Order("created_at DESC")
-	all.Limit(limit).Offset(offset).Find(&audios)
+	all.Preload("Intervals").Limit(limit).Offset(offset).Find(&audios)
 
 	var audioEntities = make([]Audio, 0)
 	for _, audio := range audios {

@@ -31,6 +31,16 @@ func InitController(router *chi.Mux) {
 				newAudio.Status = WolfStatus
 			}
 
+			if len(result.Result[0].Intervals) > 0 {
+				newAudio.Intervals = make([]Interval, 0)
+				for _, interval := range result.Result[0].Intervals {
+					newAudio.Intervals = append(newAudio.Intervals, Interval{
+						Start: interval.Start,
+						End:   interval.End,
+					})
+				}
+			}
+
 			audio, err := Create(newAudio)
 			if err != nil {
 				rest.ResponseError(w, rest.Error{
