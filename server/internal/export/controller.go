@@ -11,6 +11,14 @@ func InitController(router *chi.Mux) {
 
 	router.Route("/export", func(r chi.Router) {
 
+		r.Get("/excel", func(w http.ResponseWriter, r *http.Request) {
+			file, filename := createExcelAllData()
+
+			w.Header().Set("Content-Disposition", "attachment; filename="+filename)
+			w.Header().Set("Content-Length", string(len(file)))
+			w.Write(file)
+		})
+
 		r.Get("/excel/{projectID}", func(w http.ResponseWriter, r *http.Request) {
 			projectID, err := strconv.ParseUint(chi.URLParam(r, "projectID"), 10, 64)
 			if err != nil {
