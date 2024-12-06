@@ -20,7 +20,7 @@ import {
   getProjectInfo,
 } from "./service";
 import { AudioList, Project } from "../../typing";
-import { DeleteOutlined, UploadOutlined } from "@ant-design/icons";
+import {DeleteOutlined, ExportOutlined, UploadOutlined} from "@ant-design/icons";
 
 export const ProjectPage: FC = () => {
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
@@ -34,9 +34,9 @@ export const ProjectPage: FC = () => {
 
   const navigate = useNavigate();
 
-  const getAudios = useCallback(() => {
-    const projectId = pathname.split("/").at(-1);
+  const projectId = pathname.split("/").at(-1);
 
+  const getAudios = useCallback(() => {
     setIsLoadingAudios(true);
     getProjectAudios(+projectId!)
       .then(({ data }) => setProjectAudios(data))
@@ -120,15 +120,24 @@ export const ProjectPage: FC = () => {
         <Typography.Title level={3} style={{ margin: "12px 0" }}>
           Audio
         </Typography.Title>
-        <Upload {...props}>
+        <Flex gap="10px" justify="space-between" align="center">
           <Button
-            type="primary"
-            icon={<UploadOutlined />}
-            loading={isUploading}
+              type="default"
+              href={`/api/export/excel/${projectId}`}
+              icon={<ExportOutlined />}
           >
-            Upload
+            Export
           </Button>
-        </Upload>
+          <Upload {...props}>
+            <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                loading={isUploading}
+            >
+              Upload
+            </Button>
+          </Upload>
+        </Flex>
       </Flex>
       <Space direction="vertical" style={{ width: "100%" }}>
         {/* <Dragger> */}

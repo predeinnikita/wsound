@@ -3,6 +3,7 @@ import styles from "./MainPage.module.css";
 import { Typography, List, Button, Flex } from "antd";
 import { Projects, getProjects } from "./service";
 import { useNavigate } from "react-router";
+import {ExportOutlined} from "@ant-design/icons";
 
 export const MainPage: FC = () => {
   const [projects, setProjects] = useState<Projects | null>(null);
@@ -21,9 +22,18 @@ export const MainPage: FC = () => {
     <div className={styles.main}>
       <Flex justify="space-between" align="center">
         <Typography.Title>Projects</Typography.Title>
-        <Button onClick={() => navigate("create-project")} type="primary">
-          Create project
-        </Button>
+          <Flex gap="10px" justify="space-between" align="center">
+            <Button
+                type="default"
+                href="/api/export/excel"
+                icon={<ExportOutlined />}
+            >
+                Export
+            </Button>
+            <Button onClick={() => navigate("create-project")} type="primary">
+              Create project
+            </Button>
+          </Flex>
       </Flex>
       <List
         loading={isLoading}
@@ -31,7 +41,7 @@ export const MainPage: FC = () => {
         bordered
         dataSource={projects?.projects || []}
         renderItem={({ name, id }) => (
-          <List.Item onClick={() => navigate({ pathname: `projects/${id}` })}>
+          <List.Item className={styles.item} onClick={() => navigate({ pathname: `projects/${id}` })}>
             <Typography.Text>{name}</Typography.Text>
           </List.Item>
         )}
