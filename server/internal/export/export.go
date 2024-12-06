@@ -39,6 +39,7 @@ func createExcelAllData() ([]byte, string) {
 		addProjectInfo(f, project)
 	}
 	f.DeleteSheet("Sheet1")
+	f.SetActiveSheet(0)
 
 	fileName := "data.xlsx"
 	buffer, _ := f.WriteToBuffer()
