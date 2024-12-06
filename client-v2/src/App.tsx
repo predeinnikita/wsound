@@ -3,7 +3,7 @@ import styles from "./app.module.css";
 import { MainPage } from "./pages/main-page/MainPage";
 import { ProjectPage } from "./pages/project-page/ProjectPage";
 import { CreateProject } from "./pages/create-project-page/CreateProject";
-import { Button, Layout, theme } from "antd";
+import { Layout, theme } from "antd";
 import { SoundOutlined } from "@ant-design/icons";
 
 const { Header, Content, Footer } = Layout;
@@ -16,7 +16,6 @@ const HeaderComponent = () => {
         style={{ fontSize: "24px", color: "white", marginRight: "8px" }}
         onClick={() => navigate("/")}
       />
-      <Button onClick={() => navigate("create-project")}>Create project</Button>
     </Header>
   );
 };

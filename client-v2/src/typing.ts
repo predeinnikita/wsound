@@ -11,6 +11,7 @@ export type Audio = {
   name: string;
   project_id: number;
   created_at: string;
+  status: "wofl" | "not_wolf";
 };
 
 export type AudioList = {
