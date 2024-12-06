@@ -59,6 +59,23 @@ func GetAudios(projectId uint64, limit int, offset int) (AudioList, error) {
 	}, nil
 }
 
+func GetAllAudios(projectId uint64) ([]Audio, error) {
+	var audios []Audio
+
+	all := connection.Where("project_id = ?", projectId).Order("created_at DESC")
+	all.Preload("Intervals").Find(&audios)
+
+	var audioEntities = make([]Audio, 0)
+	for _, audio := range audios {
+		audioEntities = append(audioEntities, audio)
+	}
+
+	var total int64
+	all.Count(&total)
+
+	return audioEntities, nil
+}
+
 func EditAudio(id uint64, data EditAudioRequest) error {
 	var audio Audio
 	result := connection.First(&audio, id)
