@@ -27,11 +27,11 @@ func InitController(router *chi.Mux) {
 			}
 
 			result := recognizer.ProcessAudio(newAudio.StorageID)
-			if result.Result[0].IsWolf {
+			if len(result.Result) > 0 && result.Result[0].IsWolf {
 				newAudio.Status = WolfStatus
 			}
 
-			if len(result.Result[0].Intervals) > 0 {
+			if len(result.Result) > 0 && len(result.Result[0].Intervals) > 0 {
 				newAudio.Intervals = make([]Interval, 0)
 				for _, interval := range result.Result[0].Intervals {
 					newAudio.Intervals = append(newAudio.Intervals, Interval{

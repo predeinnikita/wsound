@@ -20,7 +20,7 @@ import {
   getProjectInfo,
 } from "./service";
 import { AudioList, Project } from "../../typing";
-import {DeleteOutlined, ExportOutlined, UploadOutlined} from "@ant-design/icons";
+import { DeleteOutlined, DownloadOutlined, ExportOutlined, UploadOutlined } from "@ant-design/icons";
 
 export const ProjectPage: FC = () => {
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
@@ -107,7 +107,7 @@ export const ProjectPage: FC = () => {
         items={[
           {
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            title: <a onClick={() => navigate("/")}>Project list</a>,
+            title: <a onClick={() => navigate("/")}>Проекты</a>,
           },
           {
             title: currentProject.name,
@@ -118,7 +118,7 @@ export const ProjectPage: FC = () => {
       <Typography.Text>{currentProject.description}</Typography.Text>
       <Flex align="center" justify="space-between">
         <Typography.Title level={3} style={{ margin: "12px 0" }}>
-          Audio
+          Список аудио
         </Typography.Title>
         <Flex gap="10px" justify="space-between" align="center">
           <Button
@@ -126,7 +126,7 @@ export const ProjectPage: FC = () => {
               href={`/api/export/excel/${projectId}`}
               icon={<ExportOutlined />}
           >
-            Export
+            Экспорт
           </Button>
           <Upload {...props}>
             <Button
@@ -134,7 +134,7 @@ export const ProjectPage: FC = () => {
                 icon={<UploadOutlined />}
                 loading={isUploading}
             >
-              Upload
+              Загрузить
             </Button>
           </Upload>
         </Flex>
@@ -146,14 +146,19 @@ export const ProjectPage: FC = () => {
           size="large"
           bordered
           dataSource={projectAudios?.audios || []}
-          renderItem={({ name, status, id }) => (
+          renderItem={({ name, status, id, storage_id }) => (
             <List.Item>
               <Typography.Text>{name}</Typography.Text>
               <div style={{ display: "flex", alignItems: "center" }}>
-                <Tag>{status}</Tag>
+                <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
+                <Button
+                    type="text"
+                    icon={<DownloadOutlined />}
+                    href={`/api/file-storage/${storage_id}`}
+                />
                 <Button
                   danger
-                  shape="circle"
+                  type="text"
                   icon={<DeleteOutlined />}
                   onClick={() => onClickDeleteAudio(id)}
                   loading={isLoadingDeleteAudios === id}

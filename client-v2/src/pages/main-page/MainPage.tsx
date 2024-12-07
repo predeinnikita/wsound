@@ -3,7 +3,7 @@ import styles from "./MainPage.module.css";
 import { Typography, List, Button, Flex } from "antd";
 import { Projects, getProjects } from "./service";
 import { useNavigate } from "react-router";
-import {ExportOutlined} from "@ant-design/icons";
+import { ExportOutlined } from "@ant-design/icons";
 
 export const MainPage: FC = () => {
   const [projects, setProjects] = useState<Projects | null>(null);
@@ -21,17 +21,17 @@ export const MainPage: FC = () => {
   return (
     <div className={styles.main}>
       <Flex justify="space-between" align="center">
-        <Typography.Title>Projects</Typography.Title>
+        <Typography.Title>Проекты</Typography.Title>
           <Flex gap="10px" justify="space-between" align="center">
             <Button
                 type="default"
                 href="/api/export/excel"
                 icon={<ExportOutlined />}
             >
-                Export
+                Экспорт
             </Button>
             <Button onClick={() => navigate("create-project")} type="primary">
-              Create project
+              Создать проект
             </Button>
           </Flex>
       </Flex>

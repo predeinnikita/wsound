@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from "react";
 import styles from "./CreateProject.module.css";
-import { Typography } from "antd";
+import { Breadcrumb, Typography } from "antd";
 import { Button, Form, Input } from "antd";
 import { createProject, CreateProjectForm } from "./service";
 import { useNavigate } from "react-router";
@@ -21,21 +21,31 @@ export const CreateProject: FC = () => {
 
   return (
     <div className={styles.main}>
-      <Typography.Title>Create project</Typography.Title>
+      <Breadcrumb
+          items={[
+            {
+              title: <a onClick={() => navigate("/")}>Проекты</a>,
+            },
+            {
+              title: "Создание проекта",
+            },
+          ]}
+      />
+      <Typography.Title>Создать проект</Typography.Title>
       <Form
         layout="vertical"
         form={form}
         initialValues={{ name: "", description: "" }}
       >
         <Form.Item
-          label="Name"
+          label="Название"
           name="name"
           rules={[{ required: true, message: "Please input name!" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Description"
+          label="Описание"
           name="description"
           rules={[{ required: true, message: "Please input description!" }]}
         >
@@ -48,7 +58,7 @@ export const CreateProject: FC = () => {
             onClick={onSubmit}
             htmlType="submit"
           >
-            Create
+            Создать
           </Button>
         </Form.Item>
       </Form>

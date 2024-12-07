@@ -101,7 +101,9 @@ func addProjectInfo(f *excelize.File, project projects.Project) {
 			)
 		}
 
-		offset += len(audio.Intervals) - 1
+		if len(audio.Intervals) > 0 {
+			offset += len(audio.Intervals) - 1
+		}
 	}
 
 	fitColumns(f, project.Name)
