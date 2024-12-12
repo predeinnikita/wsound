@@ -22,14 +22,15 @@ export const CreateProject: FC = () => {
   return (
     <div className={styles.main}>
       <Breadcrumb
-          items={[
-            {
-              title: <a onClick={() => navigate("/")}>Проекты</a>,
-            },
-            {
-              title: "Создание проекта",
-            },
-          ]}
+        items={[
+          {
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
+            title: <a onClick={() => navigate("/")}>Проекты</a>,
+          },
+          {
+            title: "Создание проекта",
+          },
+        ]}
       />
       <Typography.Title>Создать проект</Typography.Title>
       <Form
