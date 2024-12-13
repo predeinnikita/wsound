@@ -15,6 +15,19 @@ func InitController(router *chi.Mux) {
 		// Upload File
 		router.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			file, header, err := r.FormFile("file")
+
+			fileHeader := make([]byte, 512)
+			file.Read(fileHeader)
+
+			if http.DetectContentType(fileHeader) != "audio/wave" {
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusBadRequest,
+					Message: "invalid file extension",
+					Detail:  ".wav only",
+				})
+				return
+			}
+
 			if err != nil {
 				rest.ResponseError(w, rest.Error{
 					Status:  http.StatusBadRequest,
