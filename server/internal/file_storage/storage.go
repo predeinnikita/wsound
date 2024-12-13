@@ -8,13 +8,14 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"io"
 	"log"
+	"os"
 )
 
-var endpoint = "minio:9000"
-var accessKeyID = "admin"
-var secretAccessKey = "adminadmin"
-var useSSL = false
-var bucketName = "file"
+var endpoint = os.Getenv("MINIO_ENDPOINT")
+var accessKeyID = os.Getenv("MINIO_ACCESS_KEY_ID")
+var secretAccessKey = os.Getenv("MINIO_SECRET_ACCESS_KEY")
+var useSSL = os.Getenv("MINIO_USE_SSL") == "true"
+var bucketName = os.Getenv("MINIO_BUCKET_NAME")
 
 var minioClient, _ = minio.New(endpoint, &minio.Options{
 	Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
