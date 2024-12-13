@@ -26,7 +26,16 @@ func InitController(router *chi.Mux) {
 				return
 			}
 
-			result := recognizer.ProcessAudio(newAudio.StorageID)
+			result, err := recognizer.ProcessAudio(newAudio.StorageID)
+			if err != nil {
+				rest.ResponseError(w, rest.Error{
+					Status:  http.StatusInternalServerError,
+					Message: "Error while processing audio",
+					Detail:  err.Error(),
+				})
+				return
+			}
+
 			if len(result.Result) > 0 && result.Result[0].IsWolf {
 				newAudio.Status = WolfStatus
 			}
