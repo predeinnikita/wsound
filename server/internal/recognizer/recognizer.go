@@ -9,9 +9,10 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 )
 
-const recognizerUrl = "http://model:8000/process-audio/"
+var recognizerUrl = os.Getenv("RECOGNIZER_URL")
 
 func ProcessAudio(fileId string) RecognizeResult {
 	fileBytes, fileName, err := file_storage.GetFile(fileId)
