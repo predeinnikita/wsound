@@ -32,7 +32,7 @@
 
 Запуск образа модели:
 ```bash
-    docker run --env-file .env wsound_model
+    docker run wsound_model
 ```
 
 ### Backend
