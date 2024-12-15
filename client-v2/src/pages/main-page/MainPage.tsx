@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import styles from "./MainPage.module.css";
+import styles from "./MainPage.module.scss";
 import { Typography, List, Button, Flex } from "antd";
 import { Projects, getProjects } from "./service";
 import { useNavigate } from "react-router";
@@ -20,7 +20,7 @@ export const MainPage: FC = () => {
 
   return (
     <div className={styles.main}>
-      <Flex justify="space-between" align="center">
+      <div className={styles.title}>
         <Typography.Title>Проекты</Typography.Title>
           <Flex gap="10px" justify="space-between" align="center">
             <Button
@@ -34,7 +34,7 @@ export const MainPage: FC = () => {
               Создать проект
             </Button>
           </Flex>
-      </Flex>
+      </div>
       <List
         loading={isLoading}
         size="large"

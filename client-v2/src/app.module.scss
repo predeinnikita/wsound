@@ -1,0 +1,13 @@
+@import './breakpoint.scss';
+
+main {
+  padding: 0 48px;
+  margin-top: 24px;
+  height: 100%;
+  flex: 1 1 0;
+
+  @media (max-width: $tablet-and-less) {
+    padding: 0;
+    margin-top: 0;
+  }
+}

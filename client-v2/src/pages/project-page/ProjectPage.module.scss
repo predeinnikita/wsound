@@ -1,0 +1,30 @@
+@import '../../breakpoint.scss';
+
+.main {
+  width: 100%;
+}
+
+.audioTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (max-width: $mobile-and-less) {
+    align-items: start;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+}
+
+.audio {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  @media (max-width: $tablet-and-less) {
+    align-items: start;
+    flex-direction: column;
+  }
+}

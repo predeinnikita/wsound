@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import styles from "./CreateProject.module.css";
+import styles from "./CreateProject.module.scss";
 import { Breadcrumb, Typography } from "antd";
 import { Button, Form, Input } from "antd";
 import { createProject, CreateProjectForm } from "./service";

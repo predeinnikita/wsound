@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
-import styles from "./ProjectPage.module.css";
+import styles from "./ProjectPage.module.scss";
 import {
   Breadcrumb,
   Button,
@@ -271,7 +271,7 @@ export const ProjectPage: FC = () => {
                 <Typography.Text>{currentProject.description}</Typography.Text>
               </>
           )}
-          <Flex align="center" justify="space-between">
+          <div className={styles.audioTitle}>
             <Typography.Title level={3} style={{ margin: "12px 0" }}>
               Список аудио
             </Typography.Title>
@@ -293,7 +293,7 @@ export const ProjectPage: FC = () => {
                 </Button>
               </Upload>
             </Flex>
-          </Flex>
+          </div>
           <Space direction="vertical" style={{ width: "100%" }}>
             {/* <Dragger> */}
             <List
@@ -302,8 +302,9 @@ export const ProjectPage: FC = () => {
                 bordered
                 dataSource={projectAudios?.audios || []}
                 renderItem={({ name, status, id, storage_id }) => (
-                    <List.Item>
-                      <Flex gap={8} align="center">
+                    <List.Item >
+                      <div className={styles.audio}>
+                        <div>
                         {currentEditAudio !== id && (
                             <Typography.Text>{name}</Typography.Text>
                         )}
@@ -320,34 +321,35 @@ export const ProjectPage: FC = () => {
                               </Form.Item>
                             </Form>
                         )}
-                        <Button
-                            type="text"
-                            disabled={!editAudioFormValid}
-                            onClick={() => onClickEditOrSaveAudioChanges(id)}
-                            icon={
-                              currentEditAudio === id ? (
-                                  <SaveOutlined />
-                              ) : (
-                                  <EditOutlined />
-                              )
-                            }
-                            loading={isLoadigSaveAudioChanges === id}
-                        />
-                      </Flex>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
-                        <Button
-                            type="text"
-                            icon={<DownloadOutlined />}
-                            href={`/api/file-storage/${storage_id}`}
-                        />
-                        <Button
-                            danger
-                            type="text"
-                            icon={<DeleteOutlined />}
-                            onClick={() => onClickDeleteAudio(id)}
-                            loading={isLoadingDeleteAudios === id}
-                        />
+                        </div>
+                        <div style={{display: "flex", alignItems: "center"}}>
+                          <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
+                          <Button
+                              type="text"
+                              disabled={!editAudioFormValid}
+                              onClick={() => onClickEditOrSaveAudioChanges(id)}
+                              icon={
+                                currentEditAudio === id ? (
+                                    <SaveOutlined/>
+                                ) : (
+                                    <EditOutlined/>
+                                )
+                              }
+                              loading={isLoadigSaveAudioChanges === id}
+                          />
+                          <Button
+                              type="text"
+                              icon={<DownloadOutlined/>}
+                              href={`/api/file-storage/${storage_id}`}
+                          />
+                          <Button
+                              danger
+                              type="text"
+                              icon={<DeleteOutlined/>}
+                              onClick={() => onClickDeleteAudio(id)}
+                              loading={isLoadingDeleteAudios === id}
+                          />
+                        </div>
                       </div>
                     </List.Item>
                 )}

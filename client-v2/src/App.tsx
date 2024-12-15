@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router";
-import styles from "./app.module.css";
+import styles from "./app.module.scss";
 import { MainPage } from "./pages/main-page/MainPage";
 import { ProjectPage } from "./pages/project-page/ProjectPage";
 import { CreateProject } from "./pages/create-project-page/CreateProject";
@@ -10,8 +10,8 @@ const { Header, Content, Footer } = Layout;
 const HeaderComponent = () => {
   const navigate = useNavigate();
   return (
-    <Header style={{ background: "#302E2E"}}>
-        <img src="/logo.svg" onClick={() => navigate("/")} alt="logo" />
+    <Header style={{ background: "#302E2E"}} onClick={() => navigate("/")}>
+        <img src="/logo.svg" alt="logo" />
         <span>WSound</span>
     </Header>
   );
@@ -34,14 +34,7 @@ function App() {
               <BrowserRouter>
                   <Layout style={{height: "100%", minHeight: "100vh", display: "flex"}}>
                       <HeaderComponent/>
-                      <Content
-                          style={{
-                              padding: "0 48px",
-                              marginTop: "24px",
-                              height: "100%",
-                              flex: 1,
-                          }}
-                      >
+                      <main>
                           <div
                               style={{
                                   background: colorBgContainer,
@@ -59,7 +52,7 @@ function App() {
                                   <Route path="projects/:id" index element={<ProjectPage/>}/>
                               </Routes>
                           </div>
-                      </Content>
+                      </main>
                       <Footer style={{textAlign: "center"}}>
                           Ant Design ©{new Date().getFullYear()} Created by Ant UED
                       </Footer>
