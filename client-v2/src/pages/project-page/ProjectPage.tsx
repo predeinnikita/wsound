@@ -54,7 +54,24 @@ export const ProjectPage: FC = () => {
     useState<number>(0);
 
   const [form] = Form.useForm<CreateProjectForm>();
+  const [formValid, setFormValid] = useState<boolean>(false);
+  const formValues = Form.useWatch([], form);
+  useEffect(() => {
+    form
+        .validateFields({ validateOnly: true })
+        .then(() => setFormValid(true))
+        .catch(() => setFormValid(false));
+  }, [form, formValues]);
+
   const [editAudioForm] = Form.useForm<{ name: string }>();
+  const [editAudioFormValid, setEditAudioFormValid] = useState<boolean>(false);
+  const editAudioFormValues = Form.useWatch([], editAudioForm);
+  useEffect(() => {
+    editAudioForm
+        .validateFields({ validateOnly: true })
+        .then(() => setEditAudioFormValid(true))
+        .catch(() => setEditAudioFormValid(false));
+  }, [editAudioForm, editAudioFormValues]);
 
   const [notificationApi, notificationContext] = notification.useNotification();
   const onUploadError = (message: string, description: string) => {
@@ -216,6 +233,7 @@ export const ProjectPage: FC = () => {
               )}
               <Button
                   type="dashed"
+                  disabled={!formValid}
                   icon={isEditMode ? <SaveOutlined /> : <EditOutlined />}
                   onClick={onCickEditOrSaveButton}
                   loading={isLoadigSaveProjectChanges}
@@ -234,14 +252,14 @@ export const ProjectPage: FC = () => {
                 <Form.Item
                     label="Название"
                     name="name"
-                    rules={[{ required: true, message: "Please input name!" }]}
+                    rules={[{ required: true, message: "Пожалуйста, введите название" }]}
                 >
                   <Input />
                 </Form.Item>
                 <Form.Item
                     label="Описание"
                     name="description"
-                    rules={[{ required: true, message: "Please input description!" }]}
+                    rules={[{ required: true, message: "Пожалуйста, введите описание" }]}
                 >
                   <Input />
                 </Form.Item>
@@ -295,7 +313,7 @@ export const ProjectPage: FC = () => {
                                   style={{ margin: 0 }}
                                   name="name"
                                   rules={[
-                                    { required: true, message: "Please input name!" },
+                                    { required: true, message: "Пожалуйста, введите название" },
                                   ]}
                               >
                                 <Input />
@@ -304,6 +322,7 @@ export const ProjectPage: FC = () => {
                         )}
                         <Button
                             type="text"
+                            disabled={!editAudioFormValid}
                             onClick={() => onClickEditOrSaveAudioChanges(id)}
                             icon={
                               currentEditAudio === id ? (

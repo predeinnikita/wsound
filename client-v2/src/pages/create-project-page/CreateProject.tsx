@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./CreateProject.module.css";
 import { Breadcrumb, Typography } from "antd";
 import { Button, Form, Input } from "antd";
@@ -11,6 +11,15 @@ export const CreateProject: FC = () => {
   const [form] = Form.useForm<CreateProjectForm>();
 
   const navigate = useNavigate();
+
+  const [valid, setValid] = useState<boolean>(false);
+  const formValues = Form.useWatch([], form);
+  useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(() => setValid(true))
+      .catch(() => setValid(false));
+  }, [form, formValues]);
 
   const onSubmit = useCallback(() => {
     setIsLoading(true);
@@ -41,20 +50,21 @@ export const CreateProject: FC = () => {
         <Form.Item
           label="Название"
           name="name"
-          rules={[{ required: true, message: "Please input name!" }]}
+          rules={[{ required: true, message: "Пожалуйста, введите название" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="Описание"
           name="description"
-          rules={[{ required: true, message: "Please input description!" }]}
+          rules={[{ required: true, message: "Пожалуйста, введите описание" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item>
           <Button
             loading={isLoading}
+            disabled={!valid}
             type="primary"
             onClick={onSubmit}
             htmlType="submit"
