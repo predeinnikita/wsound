@@ -56,36 +56,28 @@ export const ProjectPage: FC = () => {
   const [form] = Form.useForm<CreateProjectForm>();
   const [formValid, setFormValid] = useState<boolean>(false);
   const formValues = Form.useWatch([], form);
-  useEffect(() => {
-    form
-        .validateFields({ validateOnly: true })
-        .then(() => setFormValid(true))
-        .catch(() => setFormValid(false));
-  }, [form, formValues]);
 
   const [editAudioForm] = Form.useForm<{ name: string }>();
   const [editAudioFormValid, setEditAudioFormValid] = useState<boolean>(false);
   const editAudioFormValues = Form.useWatch([], editAudioForm);
-  useEffect(() => {
-    editAudioForm
-        .validateFields({ validateOnly: true })
-        .then(() => setEditAudioFormValid(true))
-        .catch(() => setEditAudioFormValid(false));
-  }, [editAudioForm, editAudioFormValues]);
 
   const [notificationApi, notificationContext] = notification.useNotification();
-  const onUploadError = (message: string, description: string) => {
-    notificationApi.error({
-      message: message,
-      description: description,
-    });
-  };
 
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
 
   const projectId = pathname.split("/").at(-1);
+
+  const onUploadError = useCallback(
+    (message: string, description: string) => {
+      notificationApi.error({
+        message: message,
+        description: description,
+      });
+    },
+    [notificationApi]
+  );
 
   const getAudios = useCallback(() => {
     setIsLoadingAudios(true);
@@ -139,7 +131,7 @@ export const ProjectPage: FC = () => {
         return null;
       },
     };
-  }, [getAudios, pathname]);
+  }, [getAudios, onUploadError, pathname]);
 
   const onClickDeleteAudio = useCallback(
     async (audioId: number) => {
@@ -196,6 +188,20 @@ export const ProjectPage: FC = () => {
   );
 
   useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(() => setFormValid(true))
+      .catch(() => setFormValid(false));
+  }, [form, formValues]);
+
+  useEffect(() => {
+    editAudioForm
+      .validateFields({ validateOnly: true })
+      .then(() => setEditAudioFormValid(true))
+      .catch(() => setEditAudioFormValid(false));
+  }, [editAudioForm, editAudioFormValues]);
+
+  useEffect(() => {
     getCurrentProject();
 
     getAudios();
@@ -207,156 +213,163 @@ export const ProjectPage: FC = () => {
   }
 
   return (
-      <>
-        {notificationContext}
-        <Space className={styles.main} direction="vertical">
-          <Flex align="center" justify="space-between">
-            <Breadcrumb
-                items={[
-                  {
-                    // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                    title: <a onClick={() => navigate("/")}>Проекты</a>,
-                  },
-                  {
-                    title: currentProject.name,
-                  },
-                ]}
-            />
-            <Flex gap={8}>
-              {isEditMode && (
-                  <Button
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={onClickDeleteProject}
-                      loading={isLoadingDeleteProject}
-                  />
-              )}
+    <>
+      {notificationContext}
+      <Space className={styles.main} direction="vertical">
+        <Flex align="center" justify="space-between">
+          <Breadcrumb
+            items={[
+              {
+                // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                title: <a onClick={() => navigate("/")}>Проекты</a>,
+              },
+              {
+                title: currentProject.name,
+              },
+            ]}
+          />
+          <Flex gap={8}>
+            {isEditMode && (
               <Button
-                  type="dashed"
-                  disabled={!formValid}
-                  icon={isEditMode ? <SaveOutlined /> : <EditOutlined />}
-                  onClick={onCickEditOrSaveButton}
-                  loading={isLoadigSaveProjectChanges}
+                danger
+                icon={<DeleteOutlined />}
+                onClick={onClickDeleteProject}
+                loading={isLoadingDeleteProject}
               />
-            </Flex>
-          </Flex>
-          {isEditMode && (
-              <Form
-                  layout="vertical"
-                  form={form}
-                  initialValues={{
-                    name: currentProject.name,
-                    description: currentProject.description,
-                  }}
-              >
-                <Form.Item
-                    label="Название"
-                    name="name"
-                    rules={[{ required: true, message: "Пожалуйста, введите название" }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                    label="Описание"
-                    name="description"
-                    rules={[{ required: true, message: "Пожалуйста, введите описание" }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Form>
-          )}
-          {!isEditMode && (
-              <>
-                <Typography.Title>{currentProject.name}</Typography.Title>
-                <Typography.Text>{currentProject.description}</Typography.Text>
-              </>
-          )}
-          <div className={styles.audioTitle}>
-            <Typography.Title level={3} style={{ margin: "12px 0" }}>
-              Список аудио
-            </Typography.Title>
-            <Flex gap="10px" justify="space-between" align="center">
-              <Button
-                  type="default"
-                  href={`/api/export/excel/${projectId}`}
-                  icon={<ExportOutlined />}
-              >
-                Экспорт
-              </Button>
-              <Upload {...props}>
-                <Button
-                    type="primary"
-                    icon={<UploadOutlined />}
-                    loading={isUploading}
-                >
-                  Загрузить
-                </Button>
-              </Upload>
-            </Flex>
-          </div>
-          <Space direction="vertical" style={{ width: "100%" }}>
-            {/* <Dragger> */}
-            <List
-                loading={isLoadingAudios || isLoadingAddAudios}
-                size="large"
-                bordered
-                dataSource={projectAudios?.audios || []}
-                renderItem={({ name, status, id, storage_id }) => (
-                    <List.Item >
-                      <div className={styles.audio}>
-                        <div>
-                        {currentEditAudio !== id && (
-                            <Typography.Text>{name}</Typography.Text>
-                        )}
-                        {currentEditAudio === id && (
-                            <Form form={editAudioForm} initialValues={{ name }}>
-                              <Form.Item
-                                  style={{ margin: 0 }}
-                                  name="name"
-                                  rules={[
-                                    { required: true, message: "Пожалуйста, введите название" },
-                                  ]}
-                              >
-                                <Input />
-                              </Form.Item>
-                            </Form>
-                        )}
-                        </div>
-                        <div style={{display: "flex", alignItems: "center"}}>
-                          <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
-                          <Button
-                              type="text"
-                              disabled={!editAudioFormValid}
-                              onClick={() => onClickEditOrSaveAudioChanges(id)}
-                              icon={
-                                currentEditAudio === id ? (
-                                    <SaveOutlined/>
-                                ) : (
-                                    <EditOutlined/>
-                                )
-                              }
-                              loading={isLoadigSaveAudioChanges === id}
-                          />
-                          <Button
-                              type="text"
-                              icon={<DownloadOutlined/>}
-                              href={`/api/file-storage/${storage_id}`}
-                          />
-                          <Button
-                              danger
-                              type="text"
-                              icon={<DeleteOutlined/>}
-                              onClick={() => onClickDeleteAudio(id)}
-                              loading={isLoadingDeleteAudios === id}
-                          />
-                        </div>
-                      </div>
-                    </List.Item>
-                )}
+            )}
+            <Button
+              type="dashed"
+              disabled={!formValid}
+              icon={isEditMode ? <SaveOutlined /> : <EditOutlined />}
+              onClick={onCickEditOrSaveButton}
+              loading={isLoadigSaveProjectChanges}
             />
-            {/* </Dragger> */}
-          </Space>
+          </Flex>
+        </Flex>
+        {isEditMode && (
+          <Form
+            layout="vertical"
+            form={form}
+            initialValues={{
+              name: currentProject.name,
+              description: currentProject.description,
+            }}
+          >
+            <Form.Item
+              label="Название"
+              name="name"
+              rules={[
+                { required: true, message: "Пожалуйста, введите название" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Описание"
+              name="description"
+              rules={[
+                { required: true, message: "Пожалуйста, введите описание" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Form>
+        )}
+        {!isEditMode && (
+          <>
+            <Typography.Title>{currentProject.name}</Typography.Title>
+            <Typography.Text>{currentProject.description}</Typography.Text>
+          </>
+        )}
+        <div className={styles.audioTitle}>
+          <Typography.Title level={3} style={{ margin: "12px 0" }}>
+            Список аудио
+          </Typography.Title>
+          <Flex gap="10px" justify="space-between" align="center">
+            <Button
+              type="default"
+              href={`/api/export/excel/${projectId}`}
+              icon={<ExportOutlined />}
+            >
+              Экспорт
+            </Button>
+            <Upload {...props}>
+              <Button
+                type="primary"
+                icon={<UploadOutlined />}
+                loading={isUploading}
+              >
+                Загрузить
+              </Button>
+            </Upload>
+          </Flex>
+        </div>
+        <Space direction="vertical" style={{ width: "100%" }}>
+          {/* <Dragger> */}
+          <List
+            loading={isLoadingAudios || isLoadingAddAudios}
+            size="large"
+            bordered
+            dataSource={projectAudios?.audios || []}
+            renderItem={({ name, status, id, storage_id }) => (
+              <List.Item>
+                <div className={styles.audio}>
+                  <div>
+                    {currentEditAudio !== id && (
+                      <Typography.Text>{name}</Typography.Text>
+                    )}
+                    {currentEditAudio === id && (
+                      <Form form={editAudioForm} initialValues={{ name }}>
+                        <Form.Item
+                          style={{ margin: 0 }}
+                          name="name"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Пожалуйста, введите название",
+                            },
+                          ]}
+                        >
+                          <Input />
+                        </Form.Item>
+                      </Form>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
+                    <Button
+                      type="text"
+                      disabled={!editAudioFormValid}
+                      onClick={() => onClickEditOrSaveAudioChanges(id)}
+                      icon={
+                        currentEditAudio === id ? (
+                          <SaveOutlined />
+                        ) : (
+                          <EditOutlined />
+                        )
+                      }
+                      loading={isLoadigSaveAudioChanges === id}
+                    />
+                    <Button
+                      type="text"
+                      icon={<DownloadOutlined />}
+                      href={`/api/file-storage/${storage_id}`}
+                    />
+                    <Button
+                      danger
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      onClick={() => onClickDeleteAudio(id)}
+                      loading={isLoadingDeleteAudios === id}
+                    />
+                  </div>
+                </div>
+              </List.Item>
+            )}
+          />
+          {/* </Dragger> */}
         </Space>
-      </>
+      </Space>
+    </>
   );
 };
