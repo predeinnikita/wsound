@@ -36,11 +36,14 @@ import {
 } from "@ant-design/icons";
 import { CreateProjectForm } from "../create-project-page/service";
 
+const { Dragger } = Upload;
+
 export const ProjectPage: FC = () => {
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [projectAudios, setProjectAudios] = useState<AudioList | null>(null);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [currentEditAudio, setCurrentEditAudio] = useState<number>(0);
+  const [isDrop, setIsDrop] = useState<boolean>(false);
 
   const [isLoadingAudios, setIsLoadingAudios] = useState<boolean>(false);
   const [isLoadingAddAudios, setIsLoadingAddAudios] = useState<boolean>(false);
@@ -122,6 +125,10 @@ export const ProjectPage: FC = () => {
             setIsLoadingAddAudios(false);
             getAudios();
           });
+        }
+
+        if (fileList.length === 0) {
+          setIsDrop(false);
         }
       },
       itemRender(_, file, __, { remove }) {
@@ -206,6 +213,26 @@ export const ProjectPage: FC = () => {
 
     getAudios();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const dragopver = () => {
+      setIsDrop((prev) => (!prev ? !prev : prev));
+    };
+
+    const dragleave = (e: any) => {
+      if (e.target.tagName === "MAIN") {
+        setIsDrop(false);
+      }
+    };
+
+    window.addEventListener("dragover", dragopver);
+    window.addEventListener("dragleave", dragleave);
+
+    return () => {
+      window.removeEventListener("dragover", dragopver);
+      window.removeEventListener("dragleave", dragleave);
+    };
   }, []);
 
   if (!currentProject) {
@@ -293,7 +320,7 @@ export const ProjectPage: FC = () => {
             >
               Экспорт
             </Button>
-            <Upload {...props}>
+            <Upload {...props} multiple>
               <Button
                 type="primary"
                 icon={<UploadOutlined />}
@@ -305,69 +332,70 @@ export const ProjectPage: FC = () => {
           </Flex>
         </div>
         <Space direction="vertical" style={{ width: "100%" }}>
-          {/* <Dragger> */}
-          <List
-            loading={isLoadingAudios || isLoadingAddAudios}
-            size="large"
-            bordered
-            dataSource={projectAudios?.audios || []}
-            renderItem={({ name, status, id, storage_id }) => (
-              <List.Item>
-                <div className={styles.audio}>
-                  <div>
-                    {currentEditAudio !== id && (
-                      <Typography.Text>{name}</Typography.Text>
-                    )}
-                    {currentEditAudio === id && (
-                      <Form form={editAudioForm} initialValues={{ name }}>
-                        <Form.Item
-                          style={{ margin: 0 }}
-                          name="name"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Пожалуйста, введите название",
-                            },
-                          ]}
-                        >
-                          <Input />
-                        </Form.Item>
-                      </Form>
-                    )}
+          {isDrop && <Dragger {...props} multiple height={300}></Dragger>}
+          {!isDrop && (
+            <List
+              loading={isLoadingAudios || isLoadingAddAudios}
+              size="large"
+              bordered
+              dataSource={projectAudios?.audios || []}
+              renderItem={({ name, status, id, storage_id }) => (
+                <List.Item>
+                  <div className={styles.audio}>
+                    <div>
+                      {currentEditAudio !== id && (
+                        <Typography.Text>{name}</Typography.Text>
+                      )}
+                      {currentEditAudio === id && (
+                        <Form form={editAudioForm} initialValues={{ name }}>
+                          <Form.Item
+                            style={{ margin: 0 }}
+                            name="name"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Пожалуйста, введите название",
+                              },
+                            ]}
+                          >
+                            <Input />
+                          </Form.Item>
+                        </Form>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
+                      <Button
+                        type="text"
+                        disabled={!editAudioFormValid}
+                        onClick={() => onClickEditOrSaveAudioChanges(id)}
+                        icon={
+                          currentEditAudio === id ? (
+                            <SaveOutlined />
+                          ) : (
+                            <EditOutlined />
+                          )
+                        }
+                        loading={isLoadigSaveAudioChanges === id}
+                      />
+                      <Button
+                        type="text"
+                        icon={<DownloadOutlined />}
+                        href={`/api/file-storage/${storage_id}`}
+                      />
+                      <Button
+                        danger
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => onClickDeleteAudio(id)}
+                        loading={isLoadingDeleteAudios === id}
+                      />
+                    </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
-                    <Button
-                      type="text"
-                      disabled={!editAudioFormValid}
-                      onClick={() => onClickEditOrSaveAudioChanges(id)}
-                      icon={
-                        currentEditAudio === id ? (
-                          <SaveOutlined />
-                        ) : (
-                          <EditOutlined />
-                        )
-                      }
-                      loading={isLoadigSaveAudioChanges === id}
-                    />
-                    <Button
-                      type="text"
-                      icon={<DownloadOutlined />}
-                      href={`/api/file-storage/${storage_id}`}
-                    />
-                    <Button
-                      danger
-                      type="text"
-                      icon={<DeleteOutlined />}
-                      onClick={() => onClickDeleteAudio(id)}
-                      loading={isLoadingDeleteAudios === id}
-                    />
-                  </div>
-                </div>
-              </List.Item>
-            )}
-          />
-          {/* </Dragger> */}
+                </List.Item>
+              )}
+            />
+          )}
         </Space>
       </Space>
     </>
