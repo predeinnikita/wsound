@@ -11,6 +11,7 @@ import {
   Skeleton,
   Space,
   Tag,
+  Tooltip,
   Typography,
   Upload,
   UploadProps,
@@ -30,7 +31,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
-  ExportOutlined,
+  ExportOutlined, FileZipOutlined,
   SaveOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
@@ -61,7 +62,7 @@ export const ProjectPage: FC = () => {
   const formValues = Form.useWatch([], form);
 
   const [editAudioForm] = Form.useForm<{ name: string }>();
-  const [editAudioFormValid, setEditAudioFormValid] = useState<boolean>(false);
+  const [editAudioFormValid, setEditAudioFormValid] = useState<boolean>(true);
   const editAudioFormValues = Form.useWatch([], editAudioForm);
 
   const [notificationApi, notificationContext] = notification.useNotification();
@@ -315,7 +316,7 @@ export const ProjectPage: FC = () => {
           <Flex gap="10px" justify="space-between" align="center">
             <Button
               type="default"
-              href={`/api/export/excel/${projectId}`}
+              href={`/api/export/excel/project/${projectId}`}
               icon={<ExportOutlined />}
             >
               Экспорт
@@ -365,31 +366,52 @@ export const ProjectPage: FC = () => {
                     </div>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <Tag>{status === "wolf" ? "Волк" : "Не волк"}</Tag>
-                      <Button
-                        type="text"
-                        disabled={!editAudioFormValid}
-                        onClick={() => onClickEditOrSaveAudioChanges(id)}
-                        icon={
-                          currentEditAudio === id ? (
-                            <SaveOutlined />
-                          ) : (
-                            <EditOutlined />
-                          )
-                        }
-                        loading={isLoadigSaveAudioChanges === id}
-                      />
-                      <Button
-                        type="text"
-                        icon={<DownloadOutlined />}
-                        href={`/api/file-storage/${storage_id}`}
-                      />
-                      <Button
-                        danger
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => onClickDeleteAudio(id)}
-                        loading={isLoadingDeleteAudios === id}
-                      />
+                      <Tooltip placement="topRight" title="Редактировать аудио">
+                        <Button
+                            type="text"
+                            disabled={!editAudioFormValid}
+                            onClick={() => onClickEditOrSaveAudioChanges(id)}
+                            icon={
+                              currentEditAudio === id ? (
+                                  <SaveOutlined />
+                              ) : (
+                                  <EditOutlined />
+                              )
+                            }
+                            loading={isLoadigSaveAudioChanges === id}
+                        />
+                      </Tooltip>
+                      <Tooltip placement="topRight" title="Скачать интервалы с воем">
+                        <Button
+                            disabled={status === 'not_wolf'}
+                            type="text"
+                            icon={<FileZipOutlined />}
+                            href={`/api/export/zip/audio/${id}`}
+                        />
+                      </Tooltip>
+                      <Tooltip placement="topRight" title="Экспорт Excel">
+                        <Button
+                            type="text"
+                            icon={<ExportOutlined />}
+                            href={`/api/export/excel/audio/${id}`}
+                        />
+                      </Tooltip>
+                      <Tooltip placement="topRight" title="Скачать аудио">
+                        <Button
+                            type="text"
+                            icon={<DownloadOutlined />}
+                            href={`/api/file-storage/${storage_id}`}
+                        />
+                      </Tooltip>
+                      <Tooltip placement="topRight" title="Удалить аудио">
+                        <Button
+                            danger
+                            type="text"
+                            icon={<DeleteOutlined />}
+                            onClick={() => onClickDeleteAudio(id)}
+                            loading={isLoadingDeleteAudios === id}
+                        />
+                      </Tooltip>
                     </div>
                   </div>
                 </List.Item>

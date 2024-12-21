@@ -88,7 +88,7 @@ func createZipArchive(zipFileName string, files [][]byte, fileNames []string) (*
 		return nil, fmt.Errorf("количество файлов и имён файлов не совпадает")
 	}
 
-	tempFile, err := os.CreateTemp("", zipFileName)
+	tempFile, err := os.Create(zipFileName)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка создания zip файла: %w", err)
 	}
@@ -156,7 +156,7 @@ func ExtractIntervalsFromWav(wavData []byte, intervals []audio.Interval) ([][]by
 			SourceBitDepth: decoded.SourceBitDepth,
 		}
 
-		out, err := os.CreateTemp("", "tmp_out.wav")
+		out, err := os.Create("tmp_out.wav")
 		if err != nil {
 			return nil, err
 		}
