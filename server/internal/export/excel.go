@@ -26,6 +26,24 @@ func createExcelDataByProjectId(projectId uint64) ([]byte, string) {
 	return buffer.Bytes(), fileName
 }
 
+func createExcelDataByAudioId(audioId uint64) ([]byte, string) {
+	f := excelize.NewFile()
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	audio, _ := audio.GetAudio(audioId)
+	addAudioInfo(f, audio)
+	f.DeleteSheet("Sheet1")
+
+	fileName := fmt.Sprintf("%s.xlsx", audio.Name)
+	buffer, _ := f.WriteToBuffer()
+
+	return buffer.Bytes(), fileName
+}
+
 func createExcelAllData() ([]byte, string) {
 	f := excelize.NewFile()
 	defer func() {
@@ -107,6 +125,66 @@ func addProjectInfo(f *excelize.File, project projects.Project) {
 	}
 
 	fitColumns(f, project.Name)
+}
+
+func addAudioInfo(f *excelize.File, audio audio.Audio) {
+	offset := 0
+	index, _ := f.NewSheet(audio.Name)
+	f.SetActiveSheet(index)
+
+	style, _ := f.NewStyle(&excelize.Style{
+		Fill: excelize.Fill{
+			Type:    "pattern",
+			Color:   []string{"BDD7EE"},
+			Pattern: 1,
+		},
+	})
+
+	f.SetCellValue(audio.Name, "A1", "Название аудио")
+	f.SetCellValue(audio.Name, "B1", "Статус")
+	f.SetCellValue(audio.Name, "C1", "Интервалы с воем")
+	f.SetCellStyle(audio.Name, "A1", "C1", style)
+
+	i := 0
+	if len(audio.Intervals) > 1 {
+		f.MergeCell(
+			audio.Name,
+			fmt.Sprintf("A%d", i+offset+2),
+			fmt.Sprintf("A%d", i+len(audio.Intervals)+offset+1),
+		)
+
+		f.MergeCell(
+			audio.Name,
+			fmt.Sprintf("B%d", i+offset+2),
+			fmt.Sprintf("B%d", i+len(audio.Intervals)+offset+1),
+		)
+	}
+
+	f.SetCellValue(
+		audio.Name,
+		fmt.Sprintf("A%d", i+offset+2),
+		audio.Name,
+	)
+
+	f.SetCellValue(
+		audio.Name,
+		fmt.Sprintf("B%d", i+offset+2),
+		audio.Status,
+	)
+
+	for j, interval := range audio.Intervals {
+		f.SetCellValue(
+			audio.Name,
+			fmt.Sprintf("C%d", i+j+2+offset),
+			fmt.Sprintf("%s - %s", interval.Start, interval.End),
+		)
+	}
+
+	if len(audio.Intervals) > 0 {
+		offset += len(audio.Intervals) - 1
+	}
+
+	fitColumns(f, audio.Name)
 }
 
 func fitColumns(f *excelize.File, sheetName string) {
